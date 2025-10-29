@@ -23,7 +23,10 @@ import DevicePicker from './components/DevicePicker';
 import PianoFallback from './components/PianoFallback';
 import Modal from './components/Modal';
 
+type AppScreen = 'welcome' | 'config' | 'game';
+
 function App() {
+  const [currentScreen, setCurrentScreen] = useState<AppScreen>('welcome');
   const [settings, setSettings] = useState<GameSettings>(DEFAULT_SETTINGS);
   const [snapshot, setSnapshot] = useState<GameSnapshot | null>(null);
   const [midiSupported, setMidiSupported] = useState(false);
@@ -114,10 +117,15 @@ function App() {
     []
   );
 
+  const handleWelcomeStart = () => {
+    setCurrentScreen('config');
+  };
+
   const handleStartGame = () => {
     const newSnapshot = startGame(settings);
     setSnapshot(newSnapshot);
     setShowGameOver(false);
+    setCurrentScreen('game');
   };
 
   const handlePauseGame = () => {
@@ -135,6 +143,7 @@ function App() {
   const handleResetGame = () => {
     setSnapshot(null);
     setShowGameOver(false);
+    setCurrentScreen('config');
   };
 
   const handlePlayAgain = () => {
@@ -153,26 +162,54 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-gray-900 mb-2">
-            🎹 Solideya
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Master piano sight-reading and note recognition
-          </p>
-        </header>
+      {/* Welcome Screen */}
+      {currentScreen === 'welcome' && (
+        <div className="min-h-screen flex items-center justify-center px-4">
+          <div className="text-center max-w-2xl">
+            <h1 className="text-7xl font-bold text-gray-900 mb-4">
+              🎹 Solideya
+            </h1>
+            <p className="text-gray-600 text-2xl mb-12">
+              Master piano sight-reading and note recognition
+            </p>
+            <button
+              onClick={handleWelcomeStart}
+              className="py-6 px-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-3xl font-bold rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
+            >
+              Start Training
+            </button>
+            <div className="mt-16 text-left max-w-lg mx-auto space-y-3 text-gray-700">
+              <p className="text-xl font-semibold mb-4">📌 How to play:</p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Play the first note in the sequence on your keyboard</li>
+                <li>Correct notes turn <span className="text-green-600 font-semibold">green</span></li>
+                <li>Wrong notes flash <span className="text-red-600 font-semibold">red</span> and reset the sequence</li>
+                <li>Complete sequences to earn points and build your streak!</li>
+                <li>Game continues until you run out of lives</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Left Column - Controls & Device */}
-          <div className="space-y-6">
+      {/* Configuration Screen */}
+      {currentScreen === 'config' && (
+        <div className="container mx-auto px-4 py-8">
+          <header className="text-center mb-8">
+            <h1 className="text-5xl font-bold text-gray-900 mb-2">
+              🎹 Solideya
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Configure your settings and MIDI device
+            </p>
+          </header>
+
+          <div className="max-w-2xl mx-auto space-y-6">
             <Controls
               settings={settings}
               onSettingsChange={setSettings}
-              isGameActive={isGameActive}
-              isPaused={snapshot?.isPaused ?? false}
+              isGameActive={false}
+              isPaused={false}
               onStart={handleStartGame}
               onPause={handlePauseGame}
               onResume={handleResumeGame}
@@ -194,82 +231,101 @@ function App() {
                 </p>
               </div>
             )}
+
+            {showStartGamePrompt && (
+              <div className="p-4 bg-blue-50 border-2 border-blue-400 rounded-lg animate-pulse">
+                <div className="text-blue-900 font-bold text-lg mb-2">
+                  🎹 MIDI Input Detected!
+                </div>
+                <div className="text-blue-700">
+                  Click "Start Game" above to begin playing
+                </div>
+              </div>
+            )}
+
+            <div className="text-center">
+              <button
+                onClick={() => setCurrentScreen('welcome')}
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                ← Back to Welcome
+              </button>
+            </div>
           </div>
 
-          {/* Center & Right Columns - Game Display */}
-          <div className="lg:col-span-2 space-y-6">
-            {snapshot && <Hud snapshot={snapshot} highScore={highScore} />}
+          <footer className="text-center text-gray-600 text-sm mt-12 pb-4">
+            <p>
+              © {new Date().getFullYear()} Solideya • Made with ❤️ for piano students •{' '}
+              <a
+                href="https://github.com/nicolasviboo/piano-training-app"
+                className="text-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on GitHub
+              </a>
+            </p>
+          </footer>
+        </div>
+      )}
 
-            {snapshot && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
-                </h2>
+      {/* Game Screen - Full Screen */}
+      {currentScreen === 'game' && snapshot && (
+        <div className="min-h-screen flex flex-col">
+          {/* Header with minimal controls */}
+          <header className="bg-white shadow-md px-6 py-4 flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-gray-900">
+              🎹 Solideya
+            </h1>
+            <div className="flex gap-2">
+              {!snapshot.isPaused ? (
+                <button
+                  onClick={handlePauseGame}
+                  className="py-2 px-4 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors"
+                >
+                  ⏸️ Pause
+                </button>
+              ) : (
+                <button
+                  onClick={handleResumeGame}
+                  className="py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  ▶️ Resume
+                </button>
+              )}
+              <button
+                onClick={handleResetGame}
+                className="py-2 px-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
+              >
+                🔄 Quit
+              </button>
+            </div>
+          </header>
+
+          {/* Main Game Content */}
+          <div className="flex-1 flex flex-col p-6 space-y-6">
+            <Hud snapshot={snapshot} highScore={highScore} />
+
+            <div className="flex-1 flex flex-col justify-center w-full">
+              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
+              </h2>
+              <div className="w-full">
                 <Staff
                   sequence={snapshot.sequence}
                   currentIndex={snapshot.currentIndex}
                   flashError={snapshot.flashError}
                 />
               </div>
-            )}
-
-            {!snapshot && (
-              <div className="bg-white border-2 border-gray-300 rounded-lg p-12 text-center">
-                <div className="text-6xl mb-4">🎼</div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Ready to Train?
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Configure your settings and connect your MIDI keyboard, then press Start Game!
-                </p>
-                
-                {/* Prompt when MIDI is received but game not started */}
-                {showStartGamePrompt && (
-                  <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-400 rounded-lg animate-pulse">
-                    <div className="text-blue-900 font-bold text-lg mb-2">
-                      🎹 MIDI Input Detected!
-                    </div>
-                    <div className="text-blue-700">
-                      Click "Start Game" on the left to begin playing
-                    </div>
-                  </div>
-                )}
-                
-                <div className="text-left max-w-md mx-auto space-y-2 text-sm text-gray-700">
-                  <p>📌 <strong>How to play:</strong></p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>Play the first note in the sequence on your keyboard</li>
-                    <li>Correct notes turn <span className="text-green-600 font-semibold">green</span></li>
-                    <li>Wrong notes flash <span className="text-red-600 font-semibold">red</span> and reset the sequence</li>
-                    <li>Complete sequences to earn points and build your streak!</li>
-                    <li>Game continues until you run out of lives</li>
-                  </ul>
-                </div>
-              </div>
-            )}
+            </div>
 
             {/* On-screen piano fallback */}
-            {(settings.enableFallbackPiano || !midiSupported) && snapshot && (
+            {(settings.enableFallbackPiano || !midiSupported) && (
               <PianoFallback onNoteClick={handlePianoClick} />
             )}
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="text-center text-gray-600 text-sm mt-12 pb-4">
-          <p>
-            © {new Date().getFullYear()} Solideya • Made with ❤️ for piano students •{' '}
-            <a
-              href="https://github.com/nicolasviboo/piano-training-app"
-              className="text-primary hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View on GitHub
-            </a>
-          </p>
-        </footer>
-      </div>
+      )}
 
       {/* Game Over Modal */}
       <Modal
