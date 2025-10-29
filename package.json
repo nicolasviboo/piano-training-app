@@ -1,7 +1,7 @@
 {
-  "name": "piano-note-trainer",
+  "name": "solideya",
   "version": "1.0.0",
-  "description": "A production-ready React web app for piano note recognition training with MIDI keyboard support",
+  "description": "Master piano sight-reading and note recognition with Solideya - an interactive MIDI-enabled training app",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -42,10 +42,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/piano-note-trainer.git"
+    "url": "https://github.com/nicolasviboo/piano-training-app.git"
   },
   "keywords": [
+    "solideya",
     "piano",
+    "sight-reading",
     "midi",
     "music-training",
     "note-recognition",

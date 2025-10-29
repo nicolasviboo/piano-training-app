@@ -157,10 +157,10 @@ function App() {
         {/* Header */}
         <header className="text-center mb-8">
           <h1 className="text-5xl font-bold text-gray-900 mb-2">
-            🎹 Piano Note Trainer
+            🎹 Solideya
           </h1>
           <p className="text-gray-600 text-lg">
-            Master piano note recognition with your MIDI keyboard
+            Master piano sight-reading and note recognition
           </p>
         </header>
 
@@ -258,9 +258,9 @@ function App() {
         {/* Footer */}
         <footer className="text-center text-gray-600 text-sm mt-12 pb-4">
           <p>
-            Made with ❤️ for piano students • Requires HTTPS for MIDI access •{' '}
+            © {new Date().getFullYear()} Solideya • Made with ❤️ for piano students •{' '}
             <a
-              href="https://github.com/yourusername/piano-note-trainer"
+              href="https://github.com/nicolasviboo/piano-training-app"
               className="text-primary hover:underline"
               target="_blank"
               rel="noopener noreferrer"
