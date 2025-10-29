@@ -5,14 +5,13 @@ import {
   NoteSpec,
   DIFFICULTY_CONFIGS,
   ClefChoice,
+  DifficultyConfig,
 } from './types';
 import {
   getRandomNaturalMidi,
-  getRandomMidi,
   isNatural,
   midiToPitch,
   pitchToVexKey,
-  getAccidental,
   applyAccidental,
   suggestClef,
 } from './mapping';
@@ -37,7 +36,7 @@ export function generateSequence(settings: GameSettings): NoteSpec[] {
  */
 function generateNote(
   settings: GameSettings,
-  config: ReturnType<typeof DIFFICULTY_CONFIGS[keyof typeof DIFFICULTY_CONFIGS]>
+  config: DifficultyConfig
 ): NoteSpec {
   const { minMidi, maxMidi, allowNaturalsOnly, accidentalProbability, doubleAccidentalProbability } = config;
 
@@ -94,7 +93,7 @@ function generateNote(
   const clef = determineClef(settings.clef, midi);
 
   // Generate VexFlow key
-  const vexKey = pitchToVexKey(pitch, clef);
+  const vexKey = pitchToVexKey(pitch);
 
   return {
     midi,

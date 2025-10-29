@@ -103,7 +103,12 @@ export function disconnectDevice(): void {
  * Handle incoming MIDI messages
  */
 function handleMIDIMessage(event: MIDIMessageEvent): void {
-  const [status, note, velocity] = event.data;
+  const data = event.data;
+  if (!data || data.length < 3) return;
+
+  const status = data[0];
+  const note = data[1];
+  const velocity = data[2];
 
   // Filter for NOTE_ON messages (status byte 144-159) with velocity > 0
   // NOTE_OFF is either status 128-143 or NOTE_ON with velocity 0

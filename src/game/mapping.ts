@@ -41,7 +41,7 @@ export function pitchToMidi(pitch: string): number {
  * Convert pitch to VexFlow key format
  * VexFlow uses format like "C#/4" for treble, "C#/3" for bass
  */
-export function pitchToVexKey(pitch: string, clef: 'treble' | 'bass'): string {
+export function pitchToVexKey(pitch: string): string {
   const match = pitch.match(/^([A-G])(#{1,2}|b{1,2}|n)?(-?\d+)$/);
   if (!match) throw new Error(`Invalid pitch: ${pitch}`);
 

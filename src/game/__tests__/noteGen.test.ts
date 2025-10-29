@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateSequence, validateSequence } from '../noteGen';
-import { GameSettings, Difficulty, DIFFICULTY_CONFIGS } from '../types';
+import { GameSettings, DIFFICULTY_CONFIGS } from '../types';
 import { isNatural } from '../mapping';
 
 describe('Note Generation', () => {

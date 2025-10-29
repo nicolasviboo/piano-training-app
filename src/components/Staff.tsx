@@ -38,11 +38,11 @@ export default function Staff({ sequence, currentIndex, flashError }: StaffProps
       const needsBothStaves = hasTreble && hasBass;
 
       if (needsBothStaves) {
-        renderBothClefs(context, sequence, currentIndex, flashError, width, height);
+        renderBothClefs(context, sequence, currentIndex, flashError, width);
       } else if (hasTreble) {
-        renderSingleClef(context, sequence, currentIndex, flashError, width, height, 'treble');
+        renderSingleClef(context, sequence, currentIndex, flashError, width, 'treble');
       } else {
-        renderSingleClef(context, sequence, currentIndex, flashError, width, height, 'bass');
+        renderSingleClef(context, sequence, currentIndex, flashError, width, 'bass');
       }
     } catch (error) {
       console.error('Error rendering staff:', error);
@@ -69,7 +69,6 @@ function renderSingleClef(
   currentIndex: number,
   flashError: boolean,
   width: number,
-  height: number,
   clef: 'treble' | 'bass'
 ) {
   const stave = new Stave(10, 80, width - 20);
@@ -123,8 +122,7 @@ function renderBothClefs(
   sequence: NoteSpec[],
   currentIndex: number,
   flashError: boolean,
-  width: number,
-  height: number
+  width: number
 ) {
   // Render treble clef staff
   const trebleStave = new Stave(10, 40, width - 20);

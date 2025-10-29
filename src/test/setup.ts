@@ -1,5 +1,5 @@
 // Vitest setup file
-import { expect, afterEach } from 'vitest';
+import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 // Mock Web MIDI API for tests
-global.navigator.requestMIDIAccess = async () => {
+(globalThis as any).navigator.requestMIDIAccess = async () => {
   return {
     inputs: new Map(),
     outputs: new Map(),

@@ -1,6 +1,6 @@
 // Core game loop and state management
 
-import { GameSettings, GameSnapshot, NoteSpec } from './types';
+import { GameSettings, GameSnapshot } from './types';
 import { generateSequence, regenerateSequence } from './noteGen';
 import {
   calculateScoreForCorrect,
