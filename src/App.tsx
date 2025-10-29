@@ -1,7 +1,7 @@
 // Main application component
 
 import { useState, useEffect, useCallback } from 'react';
-import { initMIDI, isMIDISupported, MIDIMessageHandler } from './midi/midi';
+import { initMIDI, isMIDISupported, updateMessageHandler, MIDIMessageHandler } from './midi/midi';
 import { GameSettings, GameSnapshot, DEFAULT_SETTINGS } from './game/types';
 import {
   startGame,
@@ -116,6 +116,11 @@ function App() {
     },
     []
   );
+
+  // Update MIDI handler whenever it changes (keeps handler fresh across screens)
+  useEffect(() => {
+    updateMessageHandler(handleMIDIMessage);
+  }, [handleMIDIMessage]);
 
   const handleWelcomeStart = () => {
     setCurrentScreen('config');

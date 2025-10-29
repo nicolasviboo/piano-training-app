@@ -89,6 +89,14 @@ export function connectDevice(deviceId: string, handler: MIDIMessageHandler): bo
 }
 
 /**
+ * Update the message handler without disconnecting
+ */
+export function updateMessageHandler(handler: MIDIMessageHandler): void {
+  messageHandler = handler;
+  console.log('MIDI message handler updated');
+}
+
+/**
  * Disconnect current MIDI device
  */
 export function disconnectDevice(): void {
