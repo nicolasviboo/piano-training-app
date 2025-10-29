@@ -196,7 +196,7 @@ function App() {
       )}
 
       {/* Configuration Screen */}
-      {currentScreen === 'config' && (
+      <div className={currentScreen === 'config' ? '' : 'hidden'}>
         <div className="container mx-auto px-4 py-8">
           <header className="text-center mb-8">
             <h1 className="text-5xl font-bold text-gray-900 mb-2">
@@ -219,6 +219,7 @@ function App() {
               onReset={handleResetGame}
             />
 
+            {/* MIDI Device Picker - Always rendered to maintain connection */}
             {midiSupported && midiInitialized && (
               <DevicePicker
                 onDeviceConnect={handleDeviceConnect}
@@ -270,10 +271,10 @@ function App() {
             </p>
           </footer>
         </div>
-      )}
+      </div>
 
       {/* Game Screen - Full Screen */}
-      {currentScreen === 'game' && snapshot && (
+      <div className={currentScreen === 'game' && snapshot ? '' : 'hidden'}>
         <div className="min-h-screen flex flex-col">
           {/* Header with minimal controls */}
           <header className="bg-white shadow-md px-6 py-4 flex items-center justify-between">
@@ -281,7 +282,7 @@ function App() {
               🎹 Solideya
             </h1>
             <div className="flex gap-2">
-              {!snapshot.isPaused ? (
+              {snapshot && !snapshot.isPaused ? (
                 <button
                   onClick={handlePauseGame}
                   className="py-2 px-4 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors"
@@ -306,29 +307,31 @@ function App() {
           </header>
 
           {/* Main Game Content */}
-          <div className="flex-1 flex flex-col p-6 space-y-6">
-            <Hud snapshot={snapshot} highScore={highScore} />
+          {snapshot && (
+            <div className="flex-1 flex flex-col p-6 space-y-6">
+              <Hud snapshot={snapshot} highScore={highScore} />
 
-            <div className="flex-1 flex flex-col justify-center w-full">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
-              </h2>
-              <div className="w-full">
-                <Staff
-                  sequence={snapshot.sequence}
-                  currentIndex={snapshot.currentIndex}
-                  flashError={snapshot.flashError}
-                />
+              <div className="flex-1 flex flex-col justify-center w-full">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                  {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
+                </h2>
+                <div className="w-full">
+                  <Staff
+                    sequence={snapshot.sequence}
+                    currentIndex={snapshot.currentIndex}
+                    flashError={snapshot.flashError}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* On-screen piano fallback */}
-            {(settings.enableFallbackPiano || !midiSupported) && (
-              <PianoFallback onNoteClick={handlePianoClick} />
-            )}
-          </div>
+              {/* On-screen piano fallback */}
+              {(settings.enableFallbackPiano || !midiSupported) && (
+                <PianoFallback onNoteClick={handlePianoClick} />
+              )}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Game Over Modal */}
       <Modal
