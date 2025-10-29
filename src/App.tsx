@@ -158,8 +158,6 @@ function App() {
     }
   };
 
-  const isGameActive = snapshot !== null && !snapshot.isGameOver;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Welcome Screen */}
