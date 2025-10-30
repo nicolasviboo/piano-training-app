@@ -21,7 +21,7 @@ export default function Staff({ sequence, currentIndex, flashError }: StaffProps
     containerRef.current.innerHTML = '';
 
     const width = containerRef.current.clientWidth;
-    const height = 300;
+    const height = 200; // Reduced from 300 to 200 for more compact display
 
     // Create VexFlow renderer
     const renderer = new Renderer(containerRef.current, Renderer.Backends.SVG);
@@ -57,8 +57,8 @@ export default function Staff({ sequence, currentIndex, flashError }: StaffProps
   }, [sequence, currentIndex, flashError]);
 
   return (
-    <div className="bg-white border-2 border-gray-300 rounded-lg p-4 shadow-md">
-      <div ref={containerRef} className="w-full overflow-x-auto" />
+    <div className="bg-white border-2 border-gray-300 rounded-lg p-2 shadow-md max-h-full">
+      <div ref={containerRef} className="w-full overflow-x-auto" style={{ maxHeight: 'inherit' }} />
     </div>
   );
 }
@@ -71,7 +71,7 @@ function renderSingleClef(
   width: number,
   clef: 'treble' | 'bass'
 ) {
-  const stave = new Stave(10, 80, width - 20);
+  const stave = new Stave(10, 50, width - 20); // Adjusted from 80 to 50
   stave.addClef(clef);
   stave.setContext(context).draw();
 
@@ -124,13 +124,13 @@ function renderBothClefs(
   flashError: boolean,
   width: number
 ) {
-  // Render treble clef staff
-  const trebleStave = new Stave(10, 40, width - 20);
+  // Render treble clef staff (adjusted positions for smaller height)
+  const trebleStave = new Stave(10, 20, width - 20); // Adjusted from 40 to 20
   trebleStave.addClef('treble');
   trebleStave.setContext(context).draw();
 
   // Render bass clef staff
-  const bassStave = new Stave(10, 160, width - 20);
+  const bassStave = new Stave(10, 110, width - 20); // Adjusted from 160 to 110
   bassStave.addClef('bass');
   bassStave.setContext(context).draw();
 

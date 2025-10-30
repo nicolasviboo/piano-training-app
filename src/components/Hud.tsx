@@ -28,14 +28,16 @@ export default function Hud({ snapshot, highScore }: HudProps) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg shadow-lg">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-1.5 px-3 rounded-lg shadow-md">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         {/* Score */}
-        <div className="text-center">
-          <div className="text-xs font-medium opacity-90">Score</div>
-          <div className="text-2xl font-bold">{snapshot.score}</div>
+        <div className="flex items-center gap-1.5">
+          <div className="text-center">
+            <div className="text-[10px] font-medium opacity-75">Score</div>
+            <div className="text-lg font-bold">{snapshot.score}</div>
+          </div>
           {highScore && (
-            <div className="text-xs opacity-75">
+            <div className="text-[10px] opacity-60 whitespace-nowrap">
               High: {highScore.score}
             </div>
           )}
@@ -43,67 +45,68 @@ export default function Hud({ snapshot, highScore }: HudProps) {
 
         {/* Lives */}
         <div className="text-center">
-          <div className="text-xs font-medium opacity-90">Lives</div>
-          <div className="text-xl font-bold flex justify-center gap-1 mt-1">
+          <div className="text-[10px] font-medium opacity-75">Lives</div>
+          <div className="text-base font-bold flex justify-center gap-0.5">
             {renderHearts()}
           </div>
         </div>
 
         {/* Streak */}
         <div className="text-center">
-          <div className="text-xs font-medium opacity-90">Streak</div>
-          <div className="text-2xl font-bold">
+          <div className="text-[10px] font-medium opacity-75">Streak</div>
+          <div className="text-lg font-bold">
             {snapshot.streak}
-            {snapshot.streak >= 5 && <span className="text-yellow-300">🔥</span>}
+            {snapshot.streak >= 5 && <span className="text-yellow-300 ml-1">🔥</span>}
           </div>
         </div>
 
         {/* Accuracy */}
         <div className="text-center">
-          <div className="text-xs font-medium opacity-90">Accuracy</div>
-          <div className="text-2xl font-bold">{accuracy}%</div>
+          <div className="text-[10px] font-medium opacity-75">Accuracy</div>
+          <div className="text-lg font-bold">{accuracy}%</div>
         </div>
-      </div>
 
-      {/* Secondary metrics */}
-      <div className="mt-3 pt-3 border-t border-white border-opacity-30 grid grid-cols-2 md:grid-cols-3 gap-3 text-center">
-        <div>
-          <div className="text-xs opacity-75">Avg Response</div>
-          <div className="text-sm font-semibold">
+        {/* Avg Response */}
+        <div className="text-center">
+          <div className="text-[10px] opacity-75">Avg Response</div>
+          <div className="text-xs font-semibold">
             {snapshot.avgMsPerNote > 0 ? `${snapshot.avgMsPerNote}ms` : '-'}
           </div>
         </div>
 
-        <div>
-          <div className="text-xs opacity-75">Notes/Min</div>
-          <div className="text-sm font-semibold">{notesPerMinute > 0 ? notesPerMinute : '-'}</div>
+        {/* Notes/Min */}
+        <div className="text-center">
+          <div className="text-[10px] opacity-75">Notes/Min</div>
+          <div className="text-xs font-semibold">{notesPerMinute > 0 ? notesPerMinute : '-'}</div>
         </div>
 
-        <div className="col-span-2 md:col-span-1">
-          <div className="text-xs opacity-75">Device</div>
-          <div className="text-sm font-semibold flex items-center justify-center gap-2">
+        {/* Device */}
+        <div className="text-center">
+          <div className="text-[10px] opacity-75">Device</div>
+          <div className="text-xs font-semibold flex items-center justify-center gap-1">
             {connectedDevice ? (
               <>
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                <span className="truncate max-w-[150px]" title={connectedDevice.name}>
+                <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                <span className="truncate max-w-[100px]" title={connectedDevice.name}>
                   {connectedDevice.name}
                 </span>
               </>
             ) : (
               <>
-                <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                <span className="w-1.5 h-1.5 bg-red-400 rounded-full"></span>
                 <span>Not connected</span>
               </>
             )}
           </div>
         </div>
-      </div>
 
-      {snapshot.isPaused && (
-        <div className="mt-3 text-center bg-white bg-opacity-20 rounded py-1.5 font-bold text-sm">
-          ⏸️ PAUSED
-        </div>
-      )}
+        {/* Paused indicator inline */}
+        {snapshot.isPaused && (
+          <div className="text-center px-2 py-0.5 bg-white bg-opacity-20 rounded font-bold text-xs">
+            ⏸️ PAUSED
+          </div>
+        )}
+      </div>
     </div>
   );
 }

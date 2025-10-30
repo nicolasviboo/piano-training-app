@@ -418,12 +418,20 @@ function App() {
       {/* Game Screen - Full Screen */}
       <div className={currentScreen === 'game' && snapshot ? '' : 'hidden'}>
         <div className="h-screen flex flex-col">
-          {/* Header with minimal controls */}
-          <header className="bg-white shadow-md px-6 py-3 flex items-center justify-between flex-shrink-0">
-            <h1 className="text-2xl font-bold text-gray-900">
+          {/* Header with HUD and controls */}
+          <header className="bg-white shadow-md px-4 py-2 flex items-center justify-between gap-4 flex-shrink-0">
+            <h1 className="text-xl font-bold text-gray-900 flex-shrink-0">
               🎹 Solideya
             </h1>
-            <div className="flex gap-2">
+            
+            {/* HUD in the middle */}
+            {snapshot && (
+              <div className="flex-1 min-w-0">
+                <Hud snapshot={snapshot} highScore={highScore} />
+              </div>
+            )}
+            
+            <div className="flex gap-2 flex-shrink-0">
               {snapshot && !snapshot.isPaused ? (
                 <button
                   onClick={handlePauseGame}
@@ -451,21 +459,13 @@ function App() {
           {/* Main Game Content */}
           {snapshot && (
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="flex flex-col h-full px-6 py-4 gap-4">
-                {/* HUD - Compact */}
-                <div className="flex-shrink-0">
-                  <Hud snapshot={snapshot} highScore={highScore} />
-                </div>
-
-                {/* Game Content Area - Centered with proper spacing */}
-                <div className="flex-grow flex flex-col justify-center py-4 overflow-y-auto">
+              <div className="flex flex-col h-full px-6 py-2 gap-2">
+                {/* Game Content Area - Centered with proper spacing, max-height to prevent overflow */}
+                <div className="flex-grow flex flex-col justify-center py-2 overflow-hidden" style={{ maxHeight: 'calc(100vh - 180px)' }}>
                   {settings.mode === 'reading' ? (
                     // Reading Mode - Show Staff
-                    <div className="space-y-4">
-                      <h2 className="text-2xl font-bold text-gray-900 text-center">
-                        {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
-                      </h2>
-                      <div className="w-full">
+                    <div className="space-y-2 max-h-full flex flex-col items-center justify-center">
+                      <div className="w-full max-w-full" style={{ maxHeight: 'calc(100vh - 320px)' }}>
                         <Staff
                           sequence={snapshot.sequence}
                           currentIndex={snapshot.currentIndex}
@@ -475,21 +475,21 @@ function App() {
                     </div>
                   ) : (
                     // Hearing Mode - Show Play Button
-                    <div className="space-y-4">
-                      <h2 className="text-2xl font-bold text-gray-900 text-center">
+                    <div className="space-y-2 max-h-full flex flex-col items-center justify-center">
+                      <h2 className="text-lg font-bold text-gray-900 text-center">
                         {snapshot.isPaused ? '⏸️ Game Paused' : '👂 Listen and play back the note'}
                       </h2>
-                      <div className="max-w-2xl mx-auto w-full">
-                        <div className="bg-white rounded-2xl shadow-xl p-6 text-center border-4 border-purple-200">
-                          <div className="mb-4">
-                            <div className="text-5xl mb-3">🔊</div>
-                            <p className="text-base text-gray-600 mb-4">
+                      <div className="max-w-2xl mx-auto w-full" style={{ maxHeight: 'calc(100vh - 350px)' }}>
+                        <div className="bg-white rounded-2xl shadow-xl p-4 text-center border-4 border-purple-200">
+                          <div className="mb-3">
+                            <div className="text-4xl mb-2">🔊</div>
+                            <p className="text-sm text-gray-600 mb-3">
                               Click the button to hear the note
                             </p>
                             <button
                               onClick={handlePlayCurrentNote}
                               disabled={snapshot.isPaused || snapshot.isGameOver}
-                              className="py-3 px-8 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-lg font-bold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="py-2 px-6 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-base font-bold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                               type="button"
                             >
                               🎵 Play Note
@@ -497,7 +497,7 @@ function App() {
                           </div>
                           
                           {/* Visual feedback for sequence progress */}
-                          <div className="mt-4 pt-4 border-t border-gray-200">
+                          <div className="mt-3 pt-3 border-t border-gray-200">
                             <p className="text-xs text-gray-600 mb-2">Sequence Progress</p>
                             <div className="flex justify-center gap-2 flex-wrap">
                               {snapshot.sequence.map((_, index) => (
@@ -522,9 +522,9 @@ function App() {
                   )}
                 </div>
 
-                {/* On-screen piano fallback - Always visible at bottom */}
+                {/* On-screen piano fallback - Always visible at bottom with max height */}
                 {(settings.enableFallbackPiano || !midiSupported) && (
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0" style={{ maxHeight: '150px' }}>
                     <PianoFallback onNoteClick={handlePianoClick} />
                   </div>
                 )}
