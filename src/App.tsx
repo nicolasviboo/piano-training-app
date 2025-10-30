@@ -98,13 +98,12 @@ function App() {
       setHighScore(getHighScore());
 
       // Check if score qualifies for leaderboard
-      checkLeaderboardQualification(finalScore, accuracy, snapshot.bestStreak);
+      checkLeaderboardQualification(finalScore, snapshot.bestStreak);
     }
   }, [snapshot?.isGameOver, showGameOver, snapshot, settings.difficulty]);
 
   const checkLeaderboardQualification = async (
     score: number,
-    accuracy: number,
     streak: number
   ) => {
     const qualifies = await wouldMakeTopTen(score, settings.mode);
@@ -114,7 +113,7 @@ function App() {
       const entry: LeaderboardEntry = {
         playerName: '', // Will be filled when user submits
         score,
-        accuracy,
+        avgResponseTime: Math.round(snapshot?.avgMsPerNote || 0),
         streak,
         correctNotes: snapshot?.correct || 0,
         difficulty: settings.difficulty,

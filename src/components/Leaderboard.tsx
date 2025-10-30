@@ -68,6 +68,15 @@ export default function Leaderboard({ onClose, highlightEntry }: LeaderboardProp
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
+  const getDifficultyBadge = (difficulty: string) => {
+    const colors = {
+      beginner: 'bg-green-100 text-green-700',
+      intermediate: 'bg-yellow-100 text-yellow-700',
+      advanced: 'bg-red-100 text-red-700',
+    };
+    return colors[difficulty as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
@@ -155,7 +164,7 @@ export default function Leaderboard({ onClose, highlightEntry }: LeaderboardProp
 
               {/* Player Info */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-lg font-bold text-gray-900 truncate">
                     {entry.playerName}
                   </h3>
@@ -165,9 +174,12 @@ export default function Leaderboard({ onClose, highlightEntry }: LeaderboardProp
                     </span>
                   )}
                 </div>
-                <div className="flex gap-4 text-sm text-gray-600 mt-1">
-                  <span>📊 {entry.difficulty}</span>
-                  <span>📅 {formatDate(entry.date)}</span>
+                <div className="flex gap-2 text-xs mt-2 flex-wrap items-center">
+                  <span className={`px-2 py-1 rounded-full font-semibold ${getDifficultyBadge(entry.difficulty)}`}>
+                    {entry.difficulty}
+                  </span>
+                  <span className="text-gray-500">•</span>
+                  <span className="text-gray-600">{formatDate(entry.date)}</span>
                 </div>
               </div>
 
@@ -182,8 +194,8 @@ export default function Leaderboard({ onClose, highlightEntry }: LeaderboardProp
                   <div className="text-xs text-gray-500 mt-1">Notes</div>
                 </div>
                 <div className="min-w-[60px]">
-                  <div className="text-2xl font-bold text-purple-600">{entry.accuracy}%</div>
-                  <div className="text-xs text-gray-500 mt-1">Accuracy</div>
+                  <div className="text-2xl font-bold text-purple-600">{entry.avgResponseTime}ms</div>
+                  <div className="text-xs text-gray-500 mt-1">Avg Response</div>
                 </div>
                 <div className="min-w-[60px]">
                   <div className="text-2xl font-bold text-orange-600">{entry.streak}</div>

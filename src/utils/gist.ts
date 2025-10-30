@@ -3,7 +3,7 @@
 export interface LeaderboardEntry {
   playerName: string;
   score: number;
-  accuracy: number;
+  avgResponseTime: number; // in milliseconds
   streak: number;
   correctNotes: number;
   difficulty: string;
@@ -76,11 +76,11 @@ export async function submitScore(entry: LeaderboardEntry): Promise<boolean> {
     const readingScores = updatedLeaderboard.filter(e => e.mode === 'reading');
     const hearingScores = updatedLeaderboard.filter(e => e.mode === 'hearing');
 
-    // Sort each mode by score (descending), then by accuracy (descending)
+    // Sort each mode by score (descending), then by avg response time (ascending - faster is better)
     const sortScores = (scores: LeaderboardEntry[]) => {
       return scores.sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
-        return b.accuracy - a.accuracy;
+        return a.avgResponseTime - b.avgResponseTime; // Lower response time is better
       });
     };
 
