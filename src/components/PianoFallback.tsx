@@ -1,6 +1,7 @@
 // On-screen clickable piano for fallback when no MIDI is available
 
 import { midiToPitch } from '../game/mapping';
+import { initAudio, playNote } from '../utils/audio';
 
 interface PianoFallbackProps {
   onNoteClick: (midiNote: number) => void;
@@ -16,6 +17,17 @@ export default function PianoFallback({
   startOctave = 2,
   octaveCount = 4,
 }: PianoFallbackProps) {
+  const handleKeyClick = (midi: number) => {
+    // Initialize audio context on first click (required by browsers)
+    initAudio();
+    
+    // Play the note sound with a shorter duration for better feel
+    playNote(midi, 0.5, 0.3);
+    
+    // Call the game's note handler
+    onNoteClick(midi);
+  };
+
   const renderOctave = (octave: number) => {
     const baseMidi = (octave + 1) * 12;
 
@@ -29,7 +41,7 @@ export default function PianoFallback({
           return (
             <button
               key={offset}
-              onClick={() => onNoteClick(midi)}
+              onClick={() => handleKeyClick(midi)}
               className="relative w-12 h-40 bg-white border-2 border-gray-800 hover:bg-gray-100 active:bg-gray-300 transition-colors flex items-end justify-center pb-2 text-xs font-medium text-gray-600"
               title={pitch}
             >
@@ -52,7 +64,7 @@ export default function PianoFallback({
           return (
             <button
               key={offset}
-              onClick={() => onNoteClick(midi)}
+              onClick={() => handleKeyClick(midi)}
               className="absolute w-8 h-24 bg-gray-900 hover:bg-gray-700 active:bg-gray-600 transition-colors rounded-b border-2 border-gray-800 text-white text-xs font-medium flex items-end justify-center pb-1 z-10"
               style={{ left: `${leftPosition * 3}rem` }}
               title={pitch}
@@ -76,7 +88,7 @@ export default function PianoFallback({
         </div>
       </div>
       <div className="mt-4 text-sm text-gray-600 text-center">
-        Click keys to play notes (fallback mode)
+        Click keys to play notes 🎵
       </div>
     </div>
   );

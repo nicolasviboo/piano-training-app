@@ -7,6 +7,7 @@ describe('Game Loop', () => {
 
   beforeEach(() => {
     settings = {
+      mode: 'reading',
       difficulty: 'beginner',
       clef: 'treble',
       lives: 3,

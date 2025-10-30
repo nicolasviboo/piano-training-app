@@ -2,8 +2,10 @@
 
 export type ClefChoice = 'treble' | 'bass' | 'both';
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced';
+export type GameMode = 'reading' | 'hearing';
 
 export interface GameSettings {
+  mode: GameMode; // reading notes or hearing notes
   difficulty: Difficulty;
   clef: ClefChoice;
   lives: number; // default 3
@@ -78,6 +80,7 @@ export const DIFFICULTY_CONFIGS: Record<Difficulty, DifficultyConfig> = {
 };
 
 export const DEFAULT_SETTINGS: GameSettings = {
+  mode: 'reading',
   difficulty: 'beginner',
   clef: 'treble',
   lives: 3,

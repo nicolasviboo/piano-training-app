@@ -14,6 +14,7 @@ import {
 import { calculateFinalScore, calculateDuration } from './game/scoring';
 import { saveSettings, loadSettings, saveHighScore, getHighScore, HighScoreEntry } from './utils/storage';
 import { getCurrentTime } from './utils/time';
+import { initAudio, playNote } from './utils/audio';
 
 // Components
 import Staff from './components/Staff';
@@ -122,7 +123,8 @@ function App() {
     updateMessageHandler(handleMIDIMessage);
   }, [handleMIDIMessage]);
 
-  const handleWelcomeStart = () => {
+  const handleWelcomeStart = (mode: 'reading' | 'hearing') => {
+    setSettings({ ...settings, mode });
     setCurrentScreen('config');
   };
 
@@ -131,6 +133,11 @@ function App() {
     setSnapshot(newSnapshot);
     setShowGameOver(false);
     setCurrentScreen('game');
+    
+    // Initialize audio context for hearing mode
+    if (settings.mode === 'hearing') {
+      initAudio();
+    }
   };
 
   const handlePauseGame = () => {
@@ -163,25 +170,79 @@ function App() {
     }
   };
 
+  const handlePlayCurrentNote = () => {
+    if (snapshot && !snapshot.isPaused && !snapshot.isGameOver) {
+      const currentNote = snapshot.sequence[snapshot.currentIndex];
+      playNote(currentNote.midi, 1.0, 0.3);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Welcome Screen */}
       {currentScreen === 'welcome' && (
         <div className="min-h-screen flex items-center justify-center px-4">
-          <div className="text-center max-w-2xl">
+          <div className="text-center max-w-4xl">
             <h1 className="text-7xl font-bold text-gray-900 mb-4">
               🎹 Solideya
             </h1>
             <p className="text-gray-600 text-2xl mb-12">
               Master piano sight-reading and note recognition
             </p>
-            <button
-              onClick={handleWelcomeStart}
-              className="py-6 px-12 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-3xl font-bold rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-2xl"
-            >
-              Start Training
-            </button>
-            <div className="mt-16 text-left max-w-lg mx-auto space-y-3 text-gray-700">
+            
+            {/* Game Mode Selection */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+                Choose Your Challenge
+              </h2>
+              <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                {/* Reading Challenge */}
+                <button
+                  onClick={() => handleWelcomeStart('reading')}
+                  className="group relative p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 border-4 border-blue-200 hover:border-blue-400"
+                >
+                  <div className="text-6xl mb-4">👀</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    Reading Challenge
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    See notes on the staff and play them on your piano
+                  </p>
+                  <div className="bg-blue-50 rounded-lg p-3 text-sm text-gray-700">
+                    <p className="font-semibold mb-2">Perfect for:</p>
+                    <ul className="text-left space-y-1">
+                      <li>• Sight-reading practice</li>
+                      <li>• Learning note positions</li>
+                      <li>• Sheet music fluency</li>
+                    </ul>
+                  </div>
+                </button>
+
+                {/* Hearing Challenge */}
+                <button
+                  onClick={() => handleWelcomeStart('hearing')}
+                  className="group relative p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 border-4 border-purple-200 hover:border-purple-400"
+                >
+                  <div className="text-6xl mb-4">👂</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    Hearing Challenge
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Listen to notes and play them back on your piano
+                  </p>
+                  <div className="bg-purple-50 rounded-lg p-3 text-sm text-gray-700">
+                    <p className="font-semibold mb-2">Perfect for:</p>
+                    <ul className="text-left space-y-1">
+                      <li>• Ear training</li>
+                      <li>• Perfect pitch development</li>
+                      <li>• Musical memory</li>
+                    </ul>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-12 text-left max-w-2xl mx-auto space-y-3 text-gray-700 bg-white rounded-xl p-6 shadow-lg">
               <p className="text-xl font-semibold mb-4">📌 How to play:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>Play the first note in the sequence on your keyboard</li>
@@ -247,10 +308,13 @@ function App() {
               </div>
             )}
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-500">
+                Want to change the game mode? Go back to the welcome screen.
+              </p>
               <button
                 onClick={() => setCurrentScreen('welcome')}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
               >
                 ← Back to Welcome
               </button>
@@ -312,16 +376,66 @@ function App() {
               <Hud snapshot={snapshot} highScore={highScore} />
 
               <div className="flex-1 flex flex-col justify-center w-full">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                  {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
-                </h2>
-                <div className="w-full">
-                  <Staff
-                    sequence={snapshot.sequence}
-                    currentIndex={snapshot.currentIndex}
-                    flashError={snapshot.flashError}
-                  />
-                </div>
+                {settings.mode === 'reading' ? (
+                  // Reading Mode - Show Staff
+                  <>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                      {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
+                    </h2>
+                    <div className="w-full">
+                      <Staff
+                        sequence={snapshot.sequence}
+                        currentIndex={snapshot.currentIndex}
+                        flashError={snapshot.flashError}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  // Hearing Mode - Show Play Button
+                  <>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+                      {snapshot.isPaused ? '⏸️ Game Paused' : '👂 Listen and play back the note'}
+                    </h2>
+                    <div className="max-w-2xl mx-auto w-full">
+                      <div className="bg-white rounded-2xl shadow-xl p-12 text-center border-4 border-purple-200">
+                        <div className="mb-8">
+                          <div className="text-8xl mb-4">🔊</div>
+                          <p className="text-xl text-gray-600 mb-6">
+                            Click the button to hear the note
+                          </p>
+                          <button
+                            onClick={handlePlayCurrentNote}
+                            disabled={snapshot.isPaused || snapshot.isGameOver}
+                            className="py-6 px-12 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-2xl font-bold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            🎵 Play Note
+                          </button>
+                        </div>
+                        
+                        {/* Visual feedback for sequence progress */}
+                        <div className="mt-8 pt-8 border-t border-gray-200">
+                          <p className="text-sm text-gray-600 mb-3">Sequence Progress</p>
+                          <div className="flex justify-center gap-2 flex-wrap">
+                            {snapshot.sequence.map((_, index) => (
+                              <div
+                                key={index}
+                                className={`w-4 h-4 rounded-full ${
+                                  index < snapshot.currentIndex
+                                    ? 'bg-green-500'
+                                    : index === snapshot.currentIndex
+                                    ? snapshot.flashError
+                                      ? 'bg-red-500 animate-pulse'
+                                      : 'bg-blue-500 animate-pulse'
+                                    : 'bg-gray-300'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* On-screen piano fallback */}

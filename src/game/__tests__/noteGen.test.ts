@@ -7,6 +7,7 @@ describe('Note Generation', () => {
   describe('generateSequence', () => {
     it('should generate correct number of notes', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'treble',
         lives: 3,
@@ -21,6 +22,7 @@ describe('Note Generation', () => {
 
     it('should respect difficulty MIDI ranges - beginner', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'treble',
         lives: 3,
@@ -40,6 +42,7 @@ describe('Note Generation', () => {
 
     it('should respect difficulty MIDI ranges - intermediate', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'intermediate',
         clef: 'treble',
         lives: 3,
@@ -59,6 +62,7 @@ describe('Note Generation', () => {
 
     it('should only generate natural notes for beginner', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'treble',
         lives: 3,
@@ -77,6 +81,7 @@ describe('Note Generation', () => {
 
     it('should respect clef setting - treble', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'treble',
         lives: 3,
@@ -94,6 +99,7 @@ describe('Note Generation', () => {
 
     it('should respect clef setting - bass', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'bass',
         lives: 3,
@@ -111,6 +117,7 @@ describe('Note Generation', () => {
 
     it('should allow both clefs when set to both', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'both',
         lives: 3,
@@ -129,6 +136,7 @@ describe('Note Generation', () => {
 
     it('should not include double accidentals when disabled', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'advanced',
         clef: 'treble',
         lives: 3,
@@ -149,6 +157,7 @@ describe('Note Generation', () => {
   describe('validateSequence', () => {
     it('should validate a correct beginner sequence', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'treble',
         lives: 3,
@@ -163,6 +172,7 @@ describe('Note Generation', () => {
 
     it('should invalidate sequence with out-of-range notes', () => {
       const settings: GameSettings = {
+        mode: 'reading',
         difficulty: 'beginner',
         clef: 'treble',
         lives: 3,

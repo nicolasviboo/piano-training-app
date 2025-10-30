@@ -39,6 +39,28 @@ export default function Controls({
     <div className="bg-white border border-gray-300 rounded-lg p-6 shadow-sm space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Game Settings</h2>
 
+      {/* Game Mode Display */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-gray-200 rounded-lg p-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Current Mode
+        </label>
+        <div className="flex items-center gap-3">
+          <div className="text-3xl">
+            {settings.mode === 'reading' ? '👀' : '👂'}
+          </div>
+          <div>
+            <div className="font-bold text-lg text-gray-900">
+              {settings.mode === 'reading' ? 'Reading Challenge' : 'Hearing Challenge'}
+            </div>
+            <div className="text-sm text-gray-600">
+              {settings.mode === 'reading' 
+                ? 'See notes and play them' 
+                : 'Hear notes and play them back'}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Difficulty */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
