@@ -78,7 +78,7 @@ export default function Leaderboard({ onClose, highlightEntry }: LeaderboardProp
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="w-full">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-4xl font-bold text-gray-900">🏆 Leaderboard</h2>
         {onClose && (

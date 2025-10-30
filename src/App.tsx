@@ -540,6 +540,7 @@ function App() {
         onClose={() => setShowLeaderboard(false)}
         title=""
         showCloseButton={false}
+        maxWidth="4xl"
       >
         <Leaderboard
           onClose={() => setShowLeaderboard(false)}
