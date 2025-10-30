@@ -29,3 +29,6 @@ coverage
 # Build
 .vite
 
+# Environment variables
+.env
+

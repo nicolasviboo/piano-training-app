@@ -21,6 +21,7 @@ export function startGame(settings: GameSettings): GameSnapshot {
     currentIndex: 0,
     score: 0,
     streak: 0,
+    bestStreak: 0,
     attempts: 0,
     correct: 0,
     lives: settings.lives,
@@ -74,6 +75,9 @@ function handleCorrectInput(
   // Update score and streak
   const scoreUpdate = calculateScoreForCorrect(snapshot.score, snapshot.streak);
 
+  // Update best streak if current streak is higher
+  const newBestStreak = Math.max(snapshot.bestStreak, scoreUpdate.streak);
+
   // Update metrics
   const newCorrect = snapshot.correct + 1;
   const newAvgMs = updateAvgResponseTime(snapshot.avgMsPerNote, responseTime, newCorrect);
@@ -91,6 +95,7 @@ function handleCorrectInput(
       currentIndex: 0,
       score: scoreUpdate.score,
       streak: scoreUpdate.streak,
+      bestStreak: newBestStreak,
       correct: newCorrect,
       avgMsPerNote: newAvgMs,
       expectingNoteSince: now,
@@ -104,6 +109,7 @@ function handleCorrectInput(
     currentIndex: newIndex,
     score: scoreUpdate.score,
     streak: scoreUpdate.streak,
+    bestStreak: newBestStreak,
     correct: newCorrect,
     avgMsPerNote: newAvgMs,
     expectingNoteSince: now,

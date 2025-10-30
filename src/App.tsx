@@ -15,6 +15,7 @@ import { calculateFinalScore, calculateDuration } from './game/scoring';
 import { saveSettings, loadSettings, saveHighScore, getHighScore, HighScoreEntry } from './utils/storage';
 import { getCurrentTime } from './utils/time';
 import { initAudio, playNote } from './utils/audio';
+import { LeaderboardEntry, submitScore, wouldMakeTopTen } from './utils/gist';
 
 // Components
 import Staff from './components/Staff';
@@ -23,6 +24,7 @@ import Controls from './components/Controls';
 import DevicePicker from './components/DevicePicker';
 import PianoFallback from './components/PianoFallback';
 import Modal from './components/Modal';
+import Leaderboard from './components/Leaderboard';
 
 type AppScreen = 'welcome' | 'config' | 'game';
 
@@ -35,6 +37,11 @@ function App() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [highScore, setHighScore] = useState<HighScoreEntry | null>(null);
   const [showStartGamePrompt, setShowStartGamePrompt] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [playerName, setPlayerName] = useState('');
+  const [pendingLeaderboardEntry, setPendingLeaderboardEntry] = useState<LeaderboardEntry | null>(null);
+  const [submittedEntry, setSubmittedEntry] = useState<LeaderboardEntry | null>(null);
+  const [qualifiesForLeaderboard, setQualifiesForLeaderboard] = useState(false);
 
   // Initialize MIDI on mount
   useEffect(() => {
@@ -82,15 +89,63 @@ function App() {
       const entry: HighScoreEntry = {
         score: finalScore,
         accuracy,
-        streak: snapshot.streak,
+        streak: snapshot.bestStreak,
         date: new Date().toISOString(),
         difficulty: settings.difficulty,
       };
 
       saveHighScore(entry);
       setHighScore(getHighScore());
+
+      // Check if score qualifies for leaderboard
+      checkLeaderboardQualification(finalScore, accuracy, snapshot.bestStreak);
     }
   }, [snapshot?.isGameOver, showGameOver, snapshot, settings.difficulty]);
+
+  const checkLeaderboardQualification = async (
+    score: number,
+    accuracy: number,
+    streak: number
+  ) => {
+    const qualifies = await wouldMakeTopTen(score, settings.mode);
+    
+    if (qualifies) {
+      // Prepare entry but wait for player name
+      const entry: LeaderboardEntry = {
+        playerName: '', // Will be filled when user submits
+        score,
+        accuracy,
+        streak,
+        correctNotes: snapshot?.correct || 0,
+        difficulty: settings.difficulty,
+        mode: settings.mode,
+        date: new Date().toISOString(),
+      };
+      setPendingLeaderboardEntry(entry);
+      setQualifiesForLeaderboard(true);
+    } else {
+      setQualifiesForLeaderboard(false);
+    }
+  };
+
+  const handleSubmitName = async () => {
+    if (!pendingLeaderboardEntry || !playerName.trim()) return;
+
+    const entry = {
+      ...pendingLeaderboardEntry,
+      playerName: playerName.trim(),
+    };
+
+    const success = await submitScore(entry);
+    
+    if (success) {
+      setSubmittedEntry(entry);
+    }
+
+    setQualifiesForLeaderboard(false);
+    setPendingLeaderboardEntry(null);
+    setPlayerName('');
+  };
 
   // MIDI message handler
   const handleMIDIMessage: MIDIMessageHandler = useCallback(
@@ -160,7 +215,20 @@ function App() {
 
   const handlePlayAgain = () => {
     setShowGameOver(false);
+    setSubmittedEntry(null);
+    setQualifiesForLeaderboard(false);
+    setPendingLeaderboardEntry(null);
+    setPlayerName('');
     handleStartGame();
+  };
+
+  const handleResetFromGameOver = () => {
+    setShowGameOver(false);
+    setSubmittedEntry(null);
+    setQualifiesForLeaderboard(false);
+    setPendingLeaderboardEntry(null);
+    setPlayerName('');
+    handleResetGame();
   };
 
   const handlePianoClick = (midiNote: number) => {
@@ -242,15 +310,26 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-12 text-left max-w-2xl mx-auto space-y-3 text-gray-700 bg-white rounded-xl p-6 shadow-lg">
-              <p className="text-xl font-semibold mb-4">📌 How to play:</p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Play the first note in the sequence on your keyboard</li>
-                <li>Correct notes turn <span className="text-green-600 font-semibold">green</span></li>
-                <li>Wrong notes flash <span className="text-red-600 font-semibold">red</span> and reset the sequence</li>
-                <li>Complete sequences to earn points and build your streak!</li>
-                <li>Game continues until you run out of lives</li>
-              </ul>
+            <div className="mt-12 space-y-6">
+              <div className="text-center">
+                <button
+                  onClick={() => setShowLeaderboard(true)}
+                  className="py-4 px-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xl font-bold rounded-xl hover:from-yellow-500 hover:to-orange-600 transition-all transform hover:scale-105 shadow-xl"
+                >
+                  🏆 View Leaderboard
+                </button>
+              </div>
+
+              <div className="text-left max-w-2xl mx-auto space-y-3 text-gray-700 bg-white rounded-xl p-6 shadow-lg">
+                <p className="text-xl font-semibold mb-4">📌 How to play:</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>Play the first note in the sequence on your keyboard</li>
+                  <li>Correct notes turn <span className="text-green-600 font-semibold">green</span></li>
+                  <li>Wrong notes flash <span className="text-red-600 font-semibold">red</span> and reset the sequence</li>
+                  <li>Complete sequences to earn points and build your streak!</li>
+                  <li>Game continues until you run out of lives</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -447,6 +526,19 @@ function App() {
         </div>
       </div>
 
+      {/* Leaderboard Modal */}
+      <Modal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+        title=""
+        showCloseButton={false}
+      >
+        <Leaderboard
+          onClose={() => setShowLeaderboard(false)}
+          highlightEntry={submittedEntry}
+        />
+      </Modal>
+
       {/* Game Over Modal */}
       <Modal
         isOpen={showGameOver}
@@ -456,6 +548,48 @@ function App() {
       >
         {snapshot && (
           <div className="space-y-6">
+            {/* Leaderboard Qualification Banner */}
+            {qualifiesForLeaderboard && !submittedEntry && (
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 border-2 border-yellow-400">
+                <div className="text-center mb-4">
+                  <div className="text-5xl mb-2">🏆</div>
+                  <p className="text-xl font-bold text-gray-900 mb-1">
+                    Top 10 Score!
+                  </p>
+                  <p className="text-gray-600">
+                    Your score qualifies for the leaderboard!
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter your name:
+                    </label>
+                    <input
+                      type="text"
+                      value={playerName}
+                      onChange={(e) => setPlayerName(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && playerName.trim() && handleSubmitName()}
+                      placeholder="Your name"
+                      maxLength={20}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-lg"
+                      autoFocus
+                    />
+                  </div>
+
+                  <button
+                    onClick={handleSubmitName}
+                    disabled={!playerName.trim()}
+                    className="w-full py-3 px-6 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-lg font-bold rounded-lg hover:from-yellow-500 hover:to-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Submit to Leaderboard
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 text-center">
               <div className="bg-blue-50 rounded-lg p-4">
                 <div className="text-3xl font-bold text-blue-600">{snapshot.score}</div>
@@ -473,19 +607,29 @@ function App() {
               </div>
               <div className="bg-orange-50 rounded-lg p-4">
                 <div className="text-3xl font-bold text-orange-600">
-                  {snapshot.streak}
+                  {snapshot.bestStreak}
                 </div>
                 <div className="text-sm text-gray-600">Best Streak</div>
               </div>
             </div>
 
+            {/* New High Score Badge */}
             {highScore && snapshot.score >= highScore.score && (
               <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 text-center">
                 <div className="text-2xl mb-2">🏆</div>
-                <div className="font-bold text-yellow-900">New High Score!</div>
+                <div className="font-bold text-yellow-900">New Personal Best!</div>
               </div>
             )}
 
+            {/* Score Submitted Confirmation */}
+            {submittedEntry && (
+              <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 text-center">
+                <div className="text-2xl mb-2">✅</div>
+                <div className="font-bold text-green-900">Score submitted to leaderboard!</div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
             <div className="flex gap-4">
               <button
                 onClick={handlePlayAgain}
@@ -494,7 +638,7 @@ function App() {
                 🔄 Play Again
               </button>
               <button
-                onClick={handleResetGame}
+                onClick={handleResetFromGameOver}
                 className="flex-1 py-3 px-6 bg-gray-500 text-white text-lg font-bold rounded-lg hover:bg-gray-600 transition-colors"
               >
                 ⚙️ Change Settings

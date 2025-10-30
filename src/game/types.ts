@@ -26,7 +26,8 @@ export interface GameSnapshot {
   sequence: NoteSpec[]; // full generated sequence
   currentIndex: number; // which note is expected now
   score: number;
-  streak: number;
+  streak: number; // current streak
+  bestStreak: number; // best streak achieved in this game
   attempts: number; // total attempts
   correct: number; // total correct
   lives: number;
