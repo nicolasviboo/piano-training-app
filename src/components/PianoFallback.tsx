@@ -17,7 +17,11 @@ export default function PianoFallback({
   startOctave = 2,
   octaveCount = 4,
 }: PianoFallbackProps) {
-  const handleKeyClick = (midi: number) => {
+  const handleKeyClick = (midi: number, event: React.MouseEvent) => {
+    // Prevent default behavior and scrolling
+    event.preventDefault();
+    event.stopPropagation();
+    
     // Initialize audio context on first click (required by browsers)
     initAudio();
     
@@ -41,9 +45,10 @@ export default function PianoFallback({
           return (
             <button
               key={offset}
-              onClick={() => handleKeyClick(midi)}
+              onClick={(e) => handleKeyClick(midi, e)}
               className="relative w-10 h-32 bg-white border-2 border-gray-800 hover:bg-gray-100 active:bg-gray-300 transition-colors flex items-end justify-center pb-2 text-xs font-medium text-gray-600"
               title={pitch}
+              type="button"
             >
               {pitch}
             </button>
@@ -64,10 +69,11 @@ export default function PianoFallback({
           return (
             <button
               key={offset}
-              onClick={() => handleKeyClick(midi)}
+              onClick={(e) => handleKeyClick(midi, e)}
               className="absolute w-7 h-20 bg-gray-900 hover:bg-gray-700 active:bg-gray-600 transition-colors rounded-b border-2 border-gray-800 text-white text-xs font-medium flex items-end justify-center pb-1 z-10"
               style={{ left: `${leftPosition * 2.5}rem` }}
               title={pitch}
+              type="button"
             >
               {pitch.replace(/\d/, '')}
             </button>

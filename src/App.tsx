@@ -450,7 +450,7 @@ function App() {
 
           {/* Main Game Content */}
           {snapshot && (
-            <div className="flex-1 flex flex-col overflow-y-auto">
+            <div className="flex-1 flex flex-col overflow-hidden">
               <div className="flex flex-col h-full px-6 py-4 gap-4">
                 {/* HUD - Compact */}
                 <div className="flex-shrink-0">
@@ -458,7 +458,7 @@ function App() {
                 </div>
 
                 {/* Game Content Area - Centered with proper spacing */}
-                <div className="flex-grow flex flex-col justify-center py-4">
+                <div className="flex-grow flex flex-col justify-center py-4 overflow-y-auto">
                   {settings.mode === 'reading' ? (
                     // Reading Mode - Show Staff
                     <div className="space-y-4">
@@ -490,6 +490,7 @@ function App() {
                               onClick={handlePlayCurrentNote}
                               disabled={snapshot.isPaused || snapshot.isGameOver}
                               className="py-3 px-8 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-lg font-bold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                              type="button"
                             >
                               🎵 Play Note
                             </button>
