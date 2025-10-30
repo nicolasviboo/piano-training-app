@@ -248,7 +248,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Welcome Screen */}
       {currentScreen === 'welcome' && (
-        <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="min-h-screen flex items-center justify-center px-4 py-8">
           <div className="text-center max-w-4xl">
             <h1 className="text-7xl font-bold text-gray-900 mb-4">
               🎹 Solideya
@@ -417,10 +417,10 @@ function App() {
 
       {/* Game Screen - Full Screen */}
       <div className={currentScreen === 'game' && snapshot ? '' : 'hidden'}>
-        <div className="min-h-screen flex flex-col">
+        <div className="h-screen flex flex-col">
           {/* Header with minimal controls */}
-          <header className="bg-white shadow-md px-6 py-4 flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-900">
+          <header className="bg-white shadow-md px-6 py-3 flex items-center justify-between flex-shrink-0">
+            <h1 className="text-2xl font-bold text-gray-900">
               🎹 Solideya
             </h1>
             <div className="flex gap-2">
@@ -450,76 +450,84 @@ function App() {
 
           {/* Main Game Content */}
           {snapshot && (
-            <div className="flex-1 flex flex-col p-6 space-y-6">
-              <Hud snapshot={snapshot} highScore={highScore} />
+            <div className="flex-1 flex flex-col overflow-y-auto">
+              <div className="flex flex-col h-full px-6 py-4 gap-4">
+                {/* HUD - Compact */}
+                <div className="flex-shrink-0">
+                  <Hud snapshot={snapshot} highScore={highScore} />
+                </div>
 
-              <div className="flex-1 flex flex-col justify-center w-full">
-                {settings.mode === 'reading' ? (
-                  // Reading Mode - Show Staff
-                  <>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                      {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
-                    </h2>
-                    <div className="w-full">
-                      <Staff
-                        sequence={snapshot.sequence}
-                        currentIndex={snapshot.currentIndex}
-                        flashError={snapshot.flashError}
-                      />
+                {/* Game Content Area - Centered with proper spacing */}
+                <div className="flex-grow flex flex-col justify-center py-4">
+                  {settings.mode === 'reading' ? (
+                    // Reading Mode - Show Staff
+                    <div className="space-y-4">
+                      <h2 className="text-2xl font-bold text-gray-900 text-center">
+                        {snapshot.isPaused ? '⏸️ Game Paused' : '🎵 Play the highlighted note'}
+                      </h2>
+                      <div className="w-full">
+                        <Staff
+                          sequence={snapshot.sequence}
+                          currentIndex={snapshot.currentIndex}
+                          flashError={snapshot.flashError}
+                        />
+                      </div>
                     </div>
-                  </>
-                ) : (
-                  // Hearing Mode - Show Play Button
-                  <>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                      {snapshot.isPaused ? '⏸️ Game Paused' : '👂 Listen and play back the note'}
-                    </h2>
-                    <div className="max-w-2xl mx-auto w-full">
-                      <div className="bg-white rounded-2xl shadow-xl p-12 text-center border-4 border-purple-200">
-                        <div className="mb-8">
-                          <div className="text-8xl mb-4">🔊</div>
-                          <p className="text-xl text-gray-600 mb-6">
-                            Click the button to hear the note
-                          </p>
-                          <button
-                            onClick={handlePlayCurrentNote}
-                            disabled={snapshot.isPaused || snapshot.isGameOver}
-                            className="py-6 px-12 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-2xl font-bold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            🎵 Play Note
-                          </button>
-                        </div>
-                        
-                        {/* Visual feedback for sequence progress */}
-                        <div className="mt-8 pt-8 border-t border-gray-200">
-                          <p className="text-sm text-gray-600 mb-3">Sequence Progress</p>
-                          <div className="flex justify-center gap-2 flex-wrap">
-                            {snapshot.sequence.map((_, index) => (
-                              <div
-                                key={index}
-                                className={`w-4 h-4 rounded-full ${
-                                  index < snapshot.currentIndex
-                                    ? 'bg-green-500'
-                                    : index === snapshot.currentIndex
-                                    ? snapshot.flashError
-                                      ? 'bg-red-500 animate-pulse'
-                                      : 'bg-blue-500 animate-pulse'
-                                    : 'bg-gray-300'
-                                }`}
-                              />
-                            ))}
+                  ) : (
+                    // Hearing Mode - Show Play Button
+                    <div className="space-y-4">
+                      <h2 className="text-2xl font-bold text-gray-900 text-center">
+                        {snapshot.isPaused ? '⏸️ Game Paused' : '👂 Listen and play back the note'}
+                      </h2>
+                      <div className="max-w-2xl mx-auto w-full">
+                        <div className="bg-white rounded-2xl shadow-xl p-6 text-center border-4 border-purple-200">
+                          <div className="mb-4">
+                            <div className="text-5xl mb-3">🔊</div>
+                            <p className="text-base text-gray-600 mb-4">
+                              Click the button to hear the note
+                            </p>
+                            <button
+                              onClick={handlePlayCurrentNote}
+                              disabled={snapshot.isPaused || snapshot.isGameOver}
+                              className="py-3 px-8 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-lg font-bold rounded-xl hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              🎵 Play Note
+                            </button>
+                          </div>
+                          
+                          {/* Visual feedback for sequence progress */}
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <p className="text-xs text-gray-600 mb-2">Sequence Progress</p>
+                            <div className="flex justify-center gap-2 flex-wrap">
+                              {snapshot.sequence.map((_, index) => (
+                                <div
+                                  key={index}
+                                  className={`w-3 h-3 rounded-full ${
+                                    index < snapshot.currentIndex
+                                      ? 'bg-green-500'
+                                      : index === snapshot.currentIndex
+                                      ? snapshot.flashError
+                                        ? 'bg-red-500 animate-pulse'
+                                        : 'bg-blue-500 animate-pulse'
+                                      : 'bg-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </>
+                  )}
+                </div>
+
+                {/* On-screen piano fallback - Always visible at bottom */}
+                {(settings.enableFallbackPiano || !midiSupported) && (
+                  <div className="flex-shrink-0">
+                    <PianoFallback onNoteClick={handlePianoClick} />
+                  </div>
                 )}
               </div>
-
-              {/* On-screen piano fallback */}
-              {(settings.enableFallbackPiano || !midiSupported) && (
-                <PianoFallback onNoteClick={handlePianoClick} />
-              )}
             </div>
           )}
         </div>

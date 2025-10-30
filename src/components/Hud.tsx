@@ -28,14 +28,14 @@ export default function Hud({ snapshot, highScore }: HudProps) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg shadow-lg">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg shadow-lg">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Score */}
         <div className="text-center">
-          <div className="text-sm font-medium opacity-90">Score</div>
-          <div className="text-3xl font-bold">{snapshot.score}</div>
+          <div className="text-xs font-medium opacity-90">Score</div>
+          <div className="text-2xl font-bold">{snapshot.score}</div>
           {highScore && (
-            <div className="text-xs opacity-75 mt-1">
+            <div className="text-xs opacity-75">
               High: {highScore.score}
             </div>
           )}
@@ -43,16 +43,16 @@ export default function Hud({ snapshot, highScore }: HudProps) {
 
         {/* Lives */}
         <div className="text-center">
-          <div className="text-sm font-medium opacity-90">Lives</div>
-          <div className="text-2xl font-bold flex justify-center gap-1 mt-1">
+          <div className="text-xs font-medium opacity-90">Lives</div>
+          <div className="text-xl font-bold flex justify-center gap-1 mt-1">
             {renderHearts()}
           </div>
         </div>
 
         {/* Streak */}
         <div className="text-center">
-          <div className="text-sm font-medium opacity-90">Streak</div>
-          <div className="text-3xl font-bold">
+          <div className="text-xs font-medium opacity-90">Streak</div>
+          <div className="text-2xl font-bold">
             {snapshot.streak}
             {snapshot.streak >= 5 && <span className="text-yellow-300">🔥</span>}
           </div>
@@ -60,28 +60,28 @@ export default function Hud({ snapshot, highScore }: HudProps) {
 
         {/* Accuracy */}
         <div className="text-center">
-          <div className="text-sm font-medium opacity-90">Accuracy</div>
-          <div className="text-3xl font-bold">{accuracy}%</div>
+          <div className="text-xs font-medium opacity-90">Accuracy</div>
+          <div className="text-2xl font-bold">{accuracy}%</div>
         </div>
       </div>
 
       {/* Secondary metrics */}
-      <div className="mt-4 pt-4 border-t border-white border-opacity-30 grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+      <div className="mt-3 pt-3 border-t border-white border-opacity-30 grid grid-cols-2 md:grid-cols-3 gap-3 text-center">
         <div>
           <div className="text-xs opacity-75">Avg Response</div>
-          <div className="font-semibold">
+          <div className="text-sm font-semibold">
             {snapshot.avgMsPerNote > 0 ? `${snapshot.avgMsPerNote}ms` : '-'}
           </div>
         </div>
 
         <div>
           <div className="text-xs opacity-75">Notes/Min</div>
-          <div className="font-semibold">{notesPerMinute > 0 ? notesPerMinute : '-'}</div>
+          <div className="text-sm font-semibold">{notesPerMinute > 0 ? notesPerMinute : '-'}</div>
         </div>
 
         <div className="col-span-2 md:col-span-1">
           <div className="text-xs opacity-75">Device</div>
-          <div className="font-semibold flex items-center justify-center gap-2">
+          <div className="text-sm font-semibold flex items-center justify-center gap-2">
             {connectedDevice ? (
               <>
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
@@ -100,7 +100,7 @@ export default function Hud({ snapshot, highScore }: HudProps) {
       </div>
 
       {snapshot.isPaused && (
-        <div className="mt-4 text-center bg-white bg-opacity-20 rounded py-2 font-bold">
+        <div className="mt-3 text-center bg-white bg-opacity-20 rounded py-1.5 font-bold text-sm">
           ⏸️ PAUSED
         </div>
       )}
